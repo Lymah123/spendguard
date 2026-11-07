@@ -1,0 +1,8 @@
+/target
+.env
+spendguard-devnet.json
+*.db
+*.db-wal
+*.db-shm
+recipient*.json
+*.bak

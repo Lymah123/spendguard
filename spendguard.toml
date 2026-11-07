@@ -1,0 +1,23 @@
+# Policy and runtime config. No secrets in this file.
+# All money values are integer lamports (1 SOL = 1_000_000_000 lamports).
+
+[network]
+cluster = "devnet"                        # the app should refuse anything else
+rpc_url = "https://api.devnet.solana.com"
+
+[policy]
+max_per_tx_lamports = 100_000_000 # 0.1 SOL
+daily_cap_lamports = 300_000_000  # 0.3 SOL
+day_boundary = "utc"              # daily budget resets at 00:00 UTC
+
+# Allowlist: label -> address. The LLM never supplies addresses;
+# the resolver maps what the user said against this table.
+[[recipients]]
+label = "ada"
+address = "AVFs2Cd14SyBiyTgFzX6343PRXHAJcuaRnKhHNqyWRWK"
+
+[parser]
+mode = "mock" # "mock" (no network) or "llm"
+
+[storage]
+db_path = "spendguard.db"

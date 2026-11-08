@@ -260,6 +260,8 @@ day_boundary = "rolling"
 
 The budget covers payments in the preceding 24 hours. This has no midnight seam and is the default when `day_boundary` is omitted.
 
+The example configuration uses `rolling`; `utc` is available but weaker for the reason above.
+
 The policy and the store use the same window, copied in one place by the service, so the amount shown by `budget` and the amount checked at reservation cannot disagree. Time-dependent code receives the current time as an argument, which lets tests control the window boundaries.
 
 ## 11. LLM parser design
@@ -335,7 +337,7 @@ The architecture does not remove all risk.
 
 To remove the compromised-host limitation, a future version could move funds behind a program:
 
-- A **policy account** (PDA) holding the owner, per-transaction cap, daily cap, a spent-so-far counter with its window start, and the allowlist.
+- A **policy account** (PDA) holding the owner, per-transaction cap, daily cap, and the allowlist, plus **24 hourly spend slots** (about 200 bytes) that together cover the trailing 24 hours. A payment is allowed only if the slots plus the payment stay within the daily cap, and slots older than 24 hours are zeroed before the check. A single spent-so-far counter with a window start would reproduce the midnight seam that the off-chain `rolling` mode avoids, because a stolen agent key could spend the cap just before the window ends and again just after. With hourly slots the worst case is two caps in 23 hours.
 - A **vault PDA** holding the SOL.
 - One `spend(recipient, amount)` instruction, signed by a low-privilege **agent key**, that checks the allowlist and both caps against the on-chain counters and transfers from the vault, or fails.
 - A separate **owner key** that manages policy and funding.
